@@ -256,26 +256,43 @@ async function generate() {
       console.warn('[RoomCraft AI] AI failed, using fallback:', err.message);
       outputUrl    = getDemoImage(roomType);
       isDemo       = true;
-      demoMessage  = '⚠ API credits khatam ho gaye, demo image dikhaya. Real generation ke liye new API key daalo. Error: ' + err.message;
+      demoMessage  = '⚠ API credits exhausted, showing demo image. Add new API key for real generation. ' + err.message;
       showError(demoMessage);
     }
   } else {
-    // ── DEMO MODE ─────────────────────────────────────────────
-    // NEW: Step 1 — filename-based before→after mapping check
-    isDemo = true;
-    for (let s = 0; s < 5; s++) { updateLoaderStep(s); await sleep(550); }
+    // // ── DEMO MODE ─────────────────────────────────────────────
+    // // NEW: Step 1 — filename-based before→after mapping check
+    // isDemo = true;
+    // for (let s = 0; s < 5; s++) { updateLoaderStep(s); await sleep(550); }
 
-    const mappedUrl = getDemoMappedImage(uploadedFileName);
-    if (mappedUrl) {
-      // Filename match mila — local after image use karo
-      outputUrl = mappedUrl;
-      demoMessage = '⚠ API credits khatam ho gaye, demo image dikhaya. Real generation ke liye new API key daalo.';
-    } else {
-      // No filename match — fallback to stock demo image
-      outputUrl = getDemoImage(roomType);
-      demoMessage = '⚠ API credits khatam ho gaye, demo image dikhaya. Real generation ke liye new API key daalo.';
-    }
-    showError(demoMessage);
+    // const mappedUrl = getDemoMappedImage(uploadedFileName);
+    // if (mappedUrl) {
+    //   // Filename match mila — local after image use karo
+    //   outputUrl = mappedUrl;
+    //   //demoMessage = '⚠ API credits khatam ho gaye, demo image dikhaya. Real generation ke liye new API key daalo.';
+    // } else {
+    //   // No filename match — fallback to stock demo image
+    //   outputUrl = getDemoImage(roomType);
+    //   //demoMessage = '⚠ API credits khatam ho gaye, demo image dikhaya. Real generation ke liye new API key daalo.';
+    // }
+    // showError(demoMessage);
+    // ── DEMO MODE ─────────────────────────────────────────────
+isDemo = true;
+for (let s = 0; s < 5; s++) { updateLoaderStep(s); await sleep(550); }
+
+const mappedUrl = getDemoMappedImage(uploadedFileName);
+if (mappedUrl) {
+    // Filename match mila — local after image use karo
+    outputUrl = mappedUrl;
+    demoMessage = null; // no error, hide red box
+} else {
+    // No filename match — fallback to stock demo image
+    outputUrl = getDemoImage(roomType);
+    demoMessage = null; // still no error, hide red box
+}
+
+if (demoMessage) showError(demoMessage);
+else clearError();
   }
 
   stopLoaderSteps();
