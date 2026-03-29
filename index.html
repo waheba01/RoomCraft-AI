@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RoomCraft AI — Intelligent Interior Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="cursor-dot" id="cursor-dot"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- ═══════════════ NAVBAR ═══════════════ -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-mark">R</div>
+    <span class="nav-name">RoomCraft <span class="nav-ai">AI</span></span>
+  </div>
+  <div class="nav-right">
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      AI Engine Active
+    </div>
+    <a class="nav-link" href="#studio">Studio</a>
+    <a class="nav-link" href="#result-section">Results</a>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<section class="hero">
+  <div class="hero-eyebrow">✦ AI-Assisted Interior Recommendation & Redesign System</div>
+  <h1 class="hero-title">
+    Redesign any room with<br/><em>intelligent AI</em>
+  </h1>
+  <p class="hero-subtitle">
+    Upload your room photo. Our AI preserves your exact walls, floor, and perspective — then adds furniture, decor, and color according to your chosen style and budget.
+  </p>
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="document.getElementById('studio').scrollIntoView({behavior:'smooth'})">
+      ✦ Open Design Studio
+    </button>
+    <button class="btn-ghost" onclick="document.getElementById('how-it-works').scrollIntoView({behavior:'smooth'})">
+      How it works →
+    </button>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">6+</div><div class="stat-label">Room Types</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><div class="stat-num">7</div><div class="stat-label">Design Styles</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><div class="stat-num">SD</div><div class="stat-label">img2img AI</div></div>
+    <div class="stat-divider"></div>
+    <div class="stat"><div class="stat-num">INR</div><div class="stat-label">India Pricing</div></div>
+  </div>
+
+  <!-- How it works strip -->
+  <div class="how-strip" id="how-it-works">
+    <div class="how-step"><span class="how-num">01</span><div class="how-txt"><strong>Upload</strong><br/>Drop your room photo</div></div>
+    <div class="how-arrow">→</div>
+    <div class="how-step"><span class="how-num">02</span><div class="how-txt"><strong>Select</strong><br/>Style, room type & budget</div></div>
+    <div class="how-arrow">→</div>
+    <div class="how-step"><span class="how-num">03</span><div class="how-txt"><strong>AI Redesign</strong><br/>Same room, new furniture</div></div>
+    <div class="how-arrow">→</div>
+    <div class="how-step"><span class="how-num">04</span><div class="how-txt"><strong>Shop</strong><br/>Buy with Amazon links</div></div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ═══════════════ STUDIO ═══════════════ -->
+<div class="studio" id="studio">
+
+  <!-- AI Model Info Banner -->
+  <div class="model-info-banner">
+    <div class="mib-left">
+      <div class="mib-badge">🤖 AI MODEL</div>
+      <div>
+        <div class="mib-title">Stable Diffusion img2img via Replicate API</div>
+        <div class="mib-sub">ControlNet-style depth conditioning · prompt_strength 0.45–0.55 · same room preserved via low denoising · 30 inference steps · CFG scale 8.0</div>
+      </div>
+    </div>
+    <div class="mib-mode" id="mib-mode-badge">Demo Mode</div>
+  </div>
+
+  <!-- API Key Section -->
+  <div class="section-label">00 — API Key (Optional)</div>
+  <div class="api-row">
+    <div class="api-icon">🔑</div>
+    <div class="api-text">
+      <p>Enter your <code>Replicate API Key</code> to enable real AI image generation. <strong>Leave blank to use Demo Mode</strong> — all furniture recommendations, cost estimation, and Amazon links work without it.</p>
+    </div>
+    <div class="api-input-wrap">
+      <input type="password" class="api-input" id="api-key-input" placeholder="r8_xxxxxxxxxxxx (optional)"/>
+      <button class="api-save-btn" onclick="saveApiKey()">Save Key</button>
+      <span class="api-saved-badge" id="api-saved-badge">✓ Key Saved</span>
+    </div>
+  </div>
+
+  <!-- Upload Section -->
+  <div class="section-label">01 — Upload Your Room Photo</div>
+  <p class="upload-desc">
+    Drop your room photo below. The AI will edit <strong>this exact image</strong> — same walls, same camera angle, same layout. Only furniture, decor, and colors will change.
+    <br/><span class="upload-note">⚠ Disclaimer: AI image output is an artistic preview. Real furniture placement may vary. The recommendation list below is the primary deliverable.</span>
+  </p>
+
+  <div class="drop-zone" id="drop-zone">
+    <input type="file" id="file-input" accept="image/*"/>
+    <div class="dc-tl drop-corner"></div>
+    <div class="dc-tr drop-corner"></div>
+    <div class="dc-bl drop-corner"></div>
+    <div class="dc-br drop-corner"></div>
+    <div class="drop-inner" id="drop-inner">
+      <div class="upload-ring">
+        <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+      </div>
+      <div>
+        <div class="drop-title">Drop your room photo here</div>
+        <div class="drop-sub">JPEG · PNG · WEBP · Max 8MB</div>
+        <div class="drop-sub" style="margin-top:6px;color:#7AAF95">Or click to browse files</div>
+      </div>
+    </div>
+    <img id="preview-img" alt="Room preview"/>
+    <div class="change-overlay">↑ Click to Change Photo</div>
+  </div>
+
+  <!-- Parameters -->
+  <div class="section-label" style="margin-top:2.5rem">02 — Design Parameters</div>
+
+  <div class="controls-grid">
+    <div class="control-block">
+      <div class="ctrl-label">Room Type</div>
+      <select class="fancy-select" id="room-type">
+        <option value="bedroom">🛏 Bedroom</option>
+        <option value="living room">🛋 Hall / Living Room</option>
+        <option value="kitchen">🍳 Kitchen</option>
+        <option value="bathroom">🚿 Bathroom</option>
+        <option value="study">📚 Study / Home Office</option>
+        <option value="balcony">🌿 Balcony</option>
+        <option value="dining room">🍽 Dining Room</option>
+        <option value="kids room">🧸 Kids Room</option>
+      </select>
+    </div>
+    <div class="control-block">
+      <div class="ctrl-label">Budget Range</div>
+      <select class="fancy-select" id="budget">
+        <option value="under 50000">Under ₹50,000 (Economy)</option>
+        <option value="50000 to 100000" selected>₹50,000 – ₹1,00,000 (Mid-Range)</option>
+        <option value="100000 to 200000">₹1,00,000 – ₹2,00,000 (Premium)</option>
+        <option value="above 200000">Above ₹2,00,000 (Luxury)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Room Size — controls how many furniture items are recommended -->
+  <div class="controls-grid" style="margin-top:0;margin-bottom:1.5rem">
+    <div class="control-block">
+      <div class="ctrl-label">Room Size</div>
+      <select class="fancy-select" id="room-size">
+        <option value="small">📦 Small (3–4 items recommended)</option>
+        <option value="medium" selected>🏠 Medium (5–7 items recommended)</option>
+        <option value="large">🏛 Large (7–9 items recommended)</option>
+      </select>
+    </div>
+    <div class="control-block">
+      <div class="ctrl-label">Size Guide</div>
+      <div class="size-guide-box">
+        <div><span class="sg-dot sg-s"></span> Small — compact / tight / under 120 sq ft</div>
+        <div><span class="sg-dot sg-m"></span> Medium — standard Indian room / 120–200 sq ft</div>
+        <div><span class="sg-dot sg-l"></span> Large — spacious / open plan / above 200 sq ft</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="control-block" style="margin-bottom:2rem">
+    <div class="ctrl-label">Interior Design Style — Select one or more</div>
+    <div class="chips-wrap" id="style-chips">
+      <span class="style-chip active" data-style="minimal"><svg class="chip-check" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 6 5 9 10 3"/></svg>Minimal</span>
+      <span class="style-chip" data-style="modern"><svg class="chip-check" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 6 5 9 10 3"/></svg>Modern</span>
+      <span class="style-chip" data-style="luxury"><svg class="chip-check" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 6 5 9 10 3"/></svg>Luxury</span>
+      <span class="style-chip" data-style="cozy"><svg class="chip-check" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 6 5 9 10 3"/></svg>Cozy</span>
+      <span class="style-chip" data-style="bohemian"><svg class="chip-check" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 6 5 9 10 3"/></svg>Bohemian</span>
+      <span class="style-chip" data-style="industrial"><svg class="chip-check" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 6 5 9 10 3"/></svg>Industrial</span>
+      <span class="style-chip" data-style="scandinavian"><svg class="chip-check" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="2 6 5 9 10 3"/></svg>Scandinavian</span>
+    </div>
+  </div>
+
+  <!-- Generate -->
+  <div class="gen-wrap">
+    <button class="btn-generate" id="generate-btn">
+      Generate My Interior Design <span class="gen-icon">✦</span>
+    </button>
+    <button class="btn-ghost" onclick="resetApp()">↺ Reset</button>
+  </div>
+
+  <!-- Loader -->
+  <div class="loader-wrap" id="loader">
+    <div class="loader-cinematic">
+      <div class="loader-ring lr-1"></div>
+      <div class="loader-ring lr-2"></div>
+      <div class="loader-ring lr-3"></div>
+      <div class="loader-center"><span>✦</span></div>
+    </div>
+    <div class="loader-steps">
+      <div class="loader-step" id="step-0"><div class="step-dot"></div>Encoding room image for AI processing</div>
+      <div class="loader-step" id="step-1"><div class="step-dot"></div>Running Stable Diffusion img2img pipeline</div>
+      <div class="loader-step" id="step-2"><div class="step-dot"></div>AI adding furniture & decor to your room</div>
+      <div class="loader-step" id="step-3"><div class="step-dot"></div>Generating furniture recommendations (INR)</div>
+      <div class="loader-step" id="step-4"><div class="step-dot"></div>Calculating renovation cost estimate</div>
+    </div>
+    <div class="loader-eta" id="loader-eta">Estimated: ~45 seconds for real AI · ~3 seconds for demo</div>
+  </div>
+
+  <!-- Error -->
+  <div class="error-box" id="error-box"></div>
+
+  <!-- ═══════════════ RESULT ═══════════════ -->
+  <div id="result-section">
+
+    <div class="result-divider">
+      <span>✦ Design Complete ✦</span>
+    </div>
+
+    <div class="section-label" style="margin-top:2rem">03 — Your Redesigned Interior</div>
+
+    <div class="result-title-area">
+      <div class="result-eyebrow" id="result-mode-label">AI Design Complete</div>
+      <h2 class="result-h2">Your <em>Redesigned</em> <span id="result-room-name">Room</span></h2>
+      <span class="style-tag" id="result-style-tag"></span>
+    </div>
+
+    <!-- Before / After Comparison -->
+    <div class="before-after-grid" id="before-after-grid">
+      <div class="ba-card">
+        <div class="ba-label">📷 Original Room</div>
+        <img id="before-img" src="" alt="Before"/>
+      </div>
+      <div class="ba-arrow">→</div>
+      <div class="ba-card">
+        <div class="ba-label">✨ AI Redesigned</div>
+        <img id="after-img" src="" alt="After"/>
+        <div id="after-img-placeholder" class="after-placeholder" style="display:none"></div>
+        <div class="after-disclaimer">* AI preview — artistic interpretation of your selected style</div>
+      </div>
+    </div>
+
+    <!-- Prompt used (for viva) -->
+    <div class="prompt-reveal" id="prompt-reveal">
+      <div class="prompt-reveal-label">🔬 AI Prompt Used (for evaluation)</div>
+      <div class="prompt-text" id="prompt-text-display"></div>
+    </div>
+
+    <!-- AI Technical Badge -->
+    <div class="model-badge">
+      <span class="model-badge-icon">🤖</span>
+      <div>
+        <div class="model-badge-title">AI Pipeline: Stable Diffusion img2img via Replicate API</div>
+        <div class="model-badge-sub">
+          Architecture: Stable Diffusion img2img · prompt_strength: 0.35 (low denoising = room preserved strongly)
+          · Steps: 30 · CFG Scale: 7.5 · Scheduler: K_EULER · Negative prompt: blocks exterior, outdoor, facade, garden, different room
+        </div>
+      </div>
+    </div>
+
+    <!-- Cost Summary Banner -->
+    <div class="cost-banner" id="cost-banner">
+      <div>
+        <div class="cost-label">💰 Total Estimated Renovation Cost</div>
+        <div class="cost-amount" id="total-cost">—</div>
+        <div class="cost-sub">Based on current Amazon.in market prices · All amounts in Indian Rupees (INR)</div>
+      </div>
+      <div class="cost-right">
+        <div class="cost-badge" id="item-count-badge">— items</div>
+        <div class="cost-badge2" id="budget-match-badge">Budget Match</div>
+      </div>
+    </div>
+
+    <!-- Furniture Recommendation Section -->
+    <div class="section-label" style="margin-top:2.5rem">04 — AI Furniture Recommendations</div>
+    <div class="furniture-intro">
+      <p>
+        The following furniture and decor items are recommended by our <strong>AI Recommendation Engine</strong> based on your selected room type, design style, and budget range.
+        All items are sourced from Amazon.in for easy purchase.
+      </p>
+    </div>
+    <div class="furniture-grid" id="furniture-grid"></div>
+
+    <!-- Summary Table -->
+    <div class="summary-table-wrap" id="summary-table-wrap">
+      <div class="section-label" style="margin-top:2.5rem">05 — Cost Breakdown Summary</div>
+      <table class="summary-table" id="summary-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Item</th>
+            <th>Category</th>
+            <th>Style Fit</th>
+            <th>Estimated Price</th>
+          </tr>
+        </thead>
+        <tbody id="summary-tbody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4" style="text-align:right;color:var(--gold-light);font-family:var(--font-mono);font-size:0.82rem;padding:1rem 1.25rem">TOTAL ESTIMATED COST</td>
+            <td id="summary-total" style="color:var(--gold-light);font-family:var(--font-display);font-size:1.1rem;padding:1rem 1.25rem;font-weight:600"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="result-actions">
+      <button class="btn-primary" onclick="window.print()">🖨 Print / Save PDF</button>
+      <button class="btn-ghost" onclick="resetApp()">↺ Design Another Room</button>
+    </div>
+
+  </div><!-- end result-section -->
+</div><!-- end studio -->
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">RoomCraft AI</div>
+    <div class="footer-sub">AI-Assisted Interior Recommendation & Redesign System · AIML Mini Project · Computer Engineering</div>
+    <div class="footer-tech">Stable Diffusion img2img · Replicate API · Rule-Based Recommendation Engine · Amazon.in Integration</div>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
