@@ -10,6 +10,12 @@
  * BUG 4: recommendFurniture() returned 12+ items — now capped by room size.
  * BUG 5: result-section stayed hidden if image failed — now always shows.
  * BUG 6: Room size dropdown was missing — now added and used in recommendation.
+ *
+ * DEMO MODE ENHANCEMENT:
+ * ─────────────────────────────────────────────────────
+ * Demo mode mein before/after folder se filename match karke after image dikhata hai.
+ * Example: assets/before/hall.jpg → assets/after/hall.jpg
+ * Agar match nahi mila, getDemoImage() fallback use hoti hai.
  * ─────────────────────────────────────────────────────
  */
 
@@ -19,6 +25,7 @@
 let imageBase64 = null;
 let imageMime   = 'image/jpeg';
 let previewSrc  = null;
+let uploadedFileName = ''; // NEW: store uploaded file name for demo mapping
 let apiKey      = '';
 
 // ─── FURNITURE KNOWLEDGE BASE ─────────────────────────────────
@@ -114,6 +121,36 @@ const ITEM_CAPS = {
   "kids room":   [3, 4, 6],
 };
 
+// ─── DEMO BEFORE → AFTER FILENAME MAPPING ────────────────────
+// Add more mappings here as needed: lowercase filename (without path) → local after path
+const DEMO_FILE_MAPPING = {
+  'hall.jpg':      'assets/after/hall.jpg',
+  'bedroom.jpg':   'assets/after/bedroom.jpg',
+  'kitchen.jpg':   'assets/after/kitchen.jpg',
+  'bathroom.jpg':  'assets/after/bathroom.jpg',
+  'study.jpg':     'assets/after/study.jpg',
+  'balcony.jpg':   'assets/after/balcony.jpg',
+  'dining.jpg':    'assets/after/dining.jpg',
+  'kids.jpg':      'assets/after/kids.jpg',
+};
+
+/**
+ * NEW: getDemoMappedImage()
+ * Uploaded filename ke base name (lowercase) se after image path lookup karta hai.
+ * Match mila → local assets/after/<file> return karta hai.
+ * Match nahi mila → null return karta hai (caller getDemoImage() use karega).
+ */
+function getDemoMappedImage(filename) {
+  if (!filename) return null;
+  // Extract just the base filename (strip any path, lowercase)
+  const baseName = filename.split(/[\\/]/).pop().toLowerCase();
+  if (DEMO_FILE_MAPPING[baseName]) {
+    console.log(`Demo mapping: before/${baseName} → ${DEMO_FILE_MAPPING[baseName]}`);
+    return DEMO_FILE_MAPPING[baseName];
+  }
+  return null;
+}
+
 // ─── API KEY ──────────────────────────────────────────────────
 function saveApiKey() {
   const val = document.getElementById('api-key-input').value.trim();
@@ -162,6 +199,7 @@ function handleFile(file) {
   if (!file.type.startsWith('image/')) { showError('Please upload a valid image (JPEG, PNG, WEBP).'); return; }
   if (file.size > 8 * 1024 * 1024) { showError('Image too large. Please use an image under 8MB.'); return; }
   imageMime = file.type || 'image/jpeg';
+  uploadedFileName = file.name || ''; // NEW: save filename for demo mapping
   const reader = new FileReader();
   reader.onload = ev => {
     previewSrc  = ev.target.result;
@@ -204,8 +242,10 @@ async function generate() {
   let outputUrl    = null;
   let isDemo       = false;
   let aiPromptUsed = buildPositivePrompt(roomType, styles, budget);
+  let demoMessage  = null; // NEW: custom demo message
 
   if (apiKey) {
+    // ── REAL AI MODE ──────────────────────────────────────────
     try {
       updateLoaderStep(0);
       const result = await callReplicateAI(roomType, styles, budget);
@@ -214,14 +254,28 @@ async function generate() {
       updateLoaderStep(4);
     } catch (err) {
       console.warn('[RoomCraft AI] AI failed, using fallback:', err.message);
-      outputUrl = getDemoImage(roomType);
-      isDemo    = true;
-      showError('⚠ AI image issue: ' + err.message + '. Showing reference image. Recommendations are still accurate.');
+      outputUrl    = getDemoImage(roomType);
+      isDemo       = true;
+      demoMessage  = '⚠ API credits khatam ho gaye, demo image dikhaya. Real generation ke liye new API key daalo. Error: ' + err.message;
+      showError(demoMessage);
     }
   } else {
+    // ── DEMO MODE ─────────────────────────────────────────────
+    // NEW: Step 1 — filename-based before→after mapping check
     isDemo = true;
     for (let s = 0; s < 5; s++) { updateLoaderStep(s); await sleep(550); }
-    outputUrl = getDemoImage(roomType);
+
+    const mappedUrl = getDemoMappedImage(uploadedFileName);
+    if (mappedUrl) {
+      // Filename match mila — local after image use karo
+      outputUrl = mappedUrl;
+      demoMessage = '⚠ API credits khatam ho gaye, demo image dikhaya. Real generation ke liye new API key daalo.';
+    } else {
+      // No filename match — fallback to stock demo image
+      outputUrl = getDemoImage(roomType);
+      demoMessage = '⚠ API credits khatam ho gaye, demo image dikhaya. Real generation ke liye new API key daalo.';
+    }
+    showError(demoMessage);
   }
 
   stopLoaderSteps();
@@ -490,7 +544,7 @@ function renderResults({ outputUrl, roomType, styles, furniture, budget, roomSiz
 
 // ─── RESET ────────────────────────────────────────────────────
 function resetApp() {
-  imageBase64 = null; previewSrc = null;
+  imageBase64 = null; previewSrc = null; uploadedFileName = ''; // NEW: reset filename too
   document.getElementById('file-input').value = '';
   const preview = document.getElementById('preview-img');
   preview.src = ''; preview.style.display = 'none';
